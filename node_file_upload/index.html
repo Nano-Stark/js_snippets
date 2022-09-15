@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Node File Uploader</title>
+    <style>
+        body {
+            font-family:Arial, Helvetica, sans-serif;
+            font-size: 1.5rem;
+            background-color: #333;
+            color: whitesmoke;
+        }
+
+        input,
+        button {
+            font: inherit;
+            width: max-content;
+        }
+
+        form {
+            display: flex;
+            flex-flow: column nowrap;
+            gap: 1.5rem;
+        }
+
+        div {
+            display: flex;
+            flex-flow: row wrap;
+            gap: 1.5rem;
+        }
+
+        p > a {
+            margin-right: 10px;
+            margin-bottom: 7px;
+            color: whitesmoke;
+            background-color: gray;
+            text-decoration: none;
+            border: 1px solid gray;
+            padding: 1rem;
+        }
+
+        p {
+            width: max-content;
+        }
+    </style> 
+</head>
+<body>
+    <h1>Node File Uploader</h1>
+    <form id="uploadForm" enctype="multipart/form-data">
+        <input type="file" id="myFiles" accept="image/*" multiple />
+        <button>Submit</button>
+        <h2></h2>
+        <h3></h3>
+        <script>
+            const path = "http://localhost:3500/"
+            const form = document.getElementById("uploadForm");
+            const sendFiles = async () => {
+                const myFiles = document.getElementById("myFiles").files;
+                const formData = new FormData();
+                // myFiles is am object of object
+                // console.log(myFiles);
+                Object.keys(myFiles).forEach(key => {
+                    formData.append(myFiles.item(key).name, myFiles.item(key))
+                })
+                const response = await fetch(path +'upload', {
+                    method: 'POST',
+                    body: formData
+                })
+                const json = await response.json();
+                // console.log(json)
+
+                const h2 = document.querySelector('h2');
+                h2.textContent = `Status: ${json?.status}`
+
+                const h3 = document.querySelector('h3');
+                h3.textContent = json?.message
+            }
+            form.addEventListener('submit', (e) => {
+                e.preventDefault()
+                sendFiles()
+                window.location.reload()
+            })
+        </script>
+    </form>
+    <div>
+        <script>
+            const button = document.getElementById("btn")
+            const getUpload = async () => {
+                const response = await fetch(path + "view", {method: 'GET'})
+                const data = await response.json()
+                // console.log(data)
+                const div = document.querySelector("div")
+                Object.values(data).forEach(data => {
+                    div.innerHTML += `<p><a href="${window.location.origin + `/view/${data}`}">${data}</a></p>`
+                    // console.log(window.location.origin + `/view/${data}`)
+                })
+                
+            }
+            getUpload()
+            console.log(path)
+        </script>
+    </div>
+    
+</body>
+</html>
